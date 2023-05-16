@@ -18,6 +18,11 @@ package server
 import (
 	"context"
 	"fmt"
+	"io/fs"
+	"os"
+	"path"
+	"path/filepath"
+	"plugin"
 	"regexp"
 
 	v1 "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
@@ -40,6 +45,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpcgo "google.golang.org/grpc"
 )
 
 type Opts struct {
@@ -99,10 +105,65 @@ func NewGRPCServer(opts *Opts) *grpc.Server {
 	v1.RegisterOrganizationServiceServer(srv, opts.OrganizationSvc)
 	v1.RegisterAuthServiceServer(srv, opts.AuthSvc)
 
+	// Load plugin
+	plugins, err := listSOFiles(os.DirFS("/"), []string{"/tmp"})
+	if err != nil {
+		panic(err)
+	}
+
+	for _, p := range plugins {
+		pl, err := plugin.Open(p)
+		if err != nil {
+			panic(err)
+		}
+
+		type InitializationType = func(*grpcgo.Server)
+		sym, err := pl.Lookup("InitializeServer")
+		if err != nil {
+			panic(err)
+		}
+
+		sym.(InitializationType)(srv.Server)
+	}
+
+	fmt.Println(plugins)
 	// Register Prometheus metrics
 	grpc_prometheus.Register(srv.Server)
 
 	return srv
+}
+
+// listSOFiles returns the absolute paths of all .so files found in any of the provided plugin directories.
+//
+// pluginDirs can be relative to the current directory or absolute.
+func listSOFiles(fsys fs.FS, pluginDirs []string) ([]string, error) {
+	matches := []string{}
+	const pluginRootDir = "/"
+
+	for _, pluginDir := range pluginDirs {
+		if !filepath.IsAbs(pluginDir) {
+			cwd, err := os.Getwd()
+			if err != nil {
+				return nil, err
+			}
+			pluginDir = filepath.Join(cwd, pluginDir)
+			fmt.Println(pluginDir)
+		}
+		relPluginDir, err := filepath.Rel(pluginRootDir, pluginDir)
+		if err != nil {
+			return nil, err
+		}
+
+		m, err := fs.Glob(fsys, path.Join(relPluginDir, "/", "*.so"))
+		if err != nil {
+			return nil, err
+		}
+
+		for _, match := range m {
+			matches = append(matches, filepath.Join(pluginRootDir, match))
+		}
+	}
+	return matches, nil
 }
 
 func craftMiddleware(opts *Opts) []middleware.Middleware {
