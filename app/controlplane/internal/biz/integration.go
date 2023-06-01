@@ -22,7 +22,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/chainloop-dev/chainloop/app/controlplane/integrations"
+	"github.com/chainloop-dev/chainloop/app/controlplane/integrations/sdk/v1"
 	"github.com/chainloop-dev/chainloop/internal/credentials"
 	"github.com/chainloop-dev/chainloop/internal/servicelogger"
 	"github.com/go-kratos/kratos/v2/log"
@@ -90,7 +90,7 @@ func NewIntegrationUseCase(opts *NewIntegrationUseCaseOpts) *IntegrationUseCase 
 }
 
 // Persist the secret and integration with its configuration in the database
-func (uc *IntegrationUseCase) RegisterAndSave(ctx context.Context, orgID string, i integrations.Registrable, regConfig *anypb.Any) (*Integration, error) {
+func (uc *IntegrationUseCase) RegisterAndSave(ctx context.Context, orgID string, i sdk.FanOut, regConfig *anypb.Any) (*Integration, error) {
 	orgUUID, err := uuid.Parse(orgID)
 	if err != nil {
 		return nil, NewErrInvalidUUID(err)
@@ -117,13 +117,13 @@ func (uc *IntegrationUseCase) RegisterAndSave(ctx context.Context, orgID string,
 	}
 
 	// Persist the integration configuration
-	return uc.integrationRepo.Create(ctx, orgUUID, preRegistration.Kind, secretID, config)
+	return uc.integrationRepo.Create(ctx, orgUUID, i.Describe().ID, secretID, config)
 }
 
 type AttachOpts struct {
 	IntegrationID, WorkflowID, OrgID string
 	// The integration that is being attached
-	Attachable integrations.Attachable
+	FanOutIntegration sdk.FanOut
 	// The attachment configuration
 	AttachmentConfig *anypb.Any
 }
@@ -132,7 +132,7 @@ type AttachOpts struct {
 // - Run specific validation for the integration
 // - Persist integration attachment
 func (uc *IntegrationUseCase) AttachToWorkflow(ctx context.Context, opts *AttachOpts) (*IntegrationAttachment, error) {
-	if opts.Attachable == nil {
+	if opts.FanOutIntegration == nil {
 		return nil, NewErrValidation(errors.New("integration not provided"))
 	}
 
@@ -168,7 +168,7 @@ func (uc *IntegrationUseCase) AttachToWorkflow(ctx context.Context, opts *Attach
 	}
 
 	// Retrieve credentials from the external secrets manager
-	creds := &integrations.Credentials{}
+	creds := &sdk.Credentials{}
 	if integration.SecretName != "" {
 		if err := uc.credsRW.ReadCredentials(ctx, integration.SecretName, creds); err != nil {
 			return nil, fmt.Errorf("reading credentials: %w", err)
@@ -176,7 +176,7 @@ func (uc *IntegrationUseCase) AttachToWorkflow(ctx context.Context, opts *Attach
 	}
 
 	// Execute integration pre-attachment logic
-	preAttachResp, err := opts.Attachable.PreAttach(ctx, &integrations.BundledConfig{Registration: integration.Config, Attachment: opts.AttachmentConfig, Credentials: creds})
+	preAttachResp, err := opts.FanOutIntegration.PreAttach(ctx, &sdk.BundledConfig{Registration: integration.Config, Attachment: opts.AttachmentConfig, Credentials: creds})
 	if err != nil {
 		return nil, NewErrValidation(err)
 	}
@@ -251,6 +251,7 @@ func (uc *IntegrationUseCase) Delete(ctx context.Context, orgID, integrationID s
 	return uc.integrationRepo.SoftDelete(ctx, integrationUUID)
 }
 
+// List attachments returns the list of attachments for a given organization and optionally workflow
 func (uc *IntegrationUseCase) ListAttachments(ctx context.Context, orgID, workflowID string) ([]*IntegrationAttachment, error) {
 	orgUUID, err := uuid.Parse(orgID)
 	if err != nil {
@@ -263,6 +264,15 @@ func (uc *IntegrationUseCase) ListAttachments(ctx context.Context, orgID, workfl
 		workflowUUID, err = uuid.Parse(workflowID)
 		if err != nil {
 			return nil, NewErrInvalidUUID(err)
+		}
+
+		// We check that the workflow belongs to the provided organization
+		// This check is mostly informative to the user
+		wf, err := uc.workflowRepo.GetOrgScoped(ctx, orgUUID, workflowUUID)
+		if err != nil {
+			return nil, err
+		} else if wf == nil {
+			return nil, NewErrNotFound("workflow")
 		}
 	}
 
