@@ -55,6 +55,15 @@ lint:
 test: 
 	go test ./... 
 
+.PHONY: build_devel
+# build for development testing
+build_devel:
+	goreleaser build --snapshot --clean --single-target
+.PHONY: build_devel_container_mages
+# build container images for development testing
+build_devel_container_mages:
+	goreleaser release --clean --snapshot --skip-sign --skip-sbom
+
 # show help
 help:
 	@echo ''

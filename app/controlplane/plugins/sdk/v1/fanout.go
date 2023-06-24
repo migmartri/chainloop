@@ -24,6 +24,8 @@ import (
 	"io"
 	"sort"
 
+	crv1 "github.com/google/go-containerregistry/pkg/v1"
+
 	schemaapi "github.com/chainloop-dev/chainloop/app/controlplane/api/workflowcontract/v1"
 	"github.com/chainloop-dev/chainloop/internal/attestation/renderer/chainloop"
 	"github.com/chainloop-dev/chainloop/internal/servicelogger"
@@ -44,8 +46,8 @@ type FanOutIntegration struct {
 	version string
 	// Optional description
 	description string
-	// Kind of inputs does the integration expect as part of the execution
-	subscribedInputs *Inputs
+	// Material types an integration expect as part of the execution
+	subscribedMaterials []*InputMaterial
 	// Rendered schema definitions
 	// Generated from the schema definitions using https://github.com/invopop/jsonschema
 	registrationJSONSchema []byte
@@ -74,6 +76,8 @@ type Core interface {
 	Describe() *IntegrationInfo
 	ValidateRegistrationRequest(jsonPayload []byte) error
 	ValidateAttachmentRequest(jsonPayload []byte) error
+	// Return if the integration is subscribed to the material type
+	IsSubscribedTo(materialType string) bool
 }
 
 // To be implemented per integration
@@ -129,11 +133,13 @@ type ExecutionRequest struct {
 // The material will contain its content as well as the metadata
 type ExecuteInput struct {
 	Attestation *ExecuteAttestation
-	Material    *ExecuteMaterial
+	Materials   []*ExecuteMaterial
 }
 
 type ExecuteAttestation struct {
-	Envelope  *dsse.Envelope
+	Envelope *dsse.Envelope
+	// Hash of the envelope
+	Hash      crv1.Hash
 	Statement *in_toto.Statement
 	Predicate chainloop.NormalizablePredicate
 }
@@ -146,13 +152,6 @@ type ExecuteMaterial struct {
 
 type Credentials struct {
 	URL, Username, Password string
-}
-
-// An integration can be subscribed to an envelope and/or a list of materials
-// To subscribe to any material type it will use schemaapi.CraftingSchema_Material_MATERIAL_TYPE_UNSPECIFIED
-type Inputs struct {
-	DSSEnvelope bool
-	Materials   []*InputMaterial
 }
 
 type InputMaterial struct {
@@ -168,11 +167,11 @@ type NewParams struct {
 
 func NewFanOut(p *NewParams, opts ...NewOpt) (*FanOutIntegration, error) {
 	c := &FanOutIntegration{
-		id:               p.ID,
-		version:          p.Version,
-		description:      p.Description,
-		log:              p.Logger,
-		subscribedInputs: &Inputs{},
+		id:                  p.ID,
+		version:             p.Version,
+		description:         p.Description,
+		log:                 p.Logger,
+		subscribedMaterials: []*InputMaterial{},
 	}
 
 	if c.log == nil {
@@ -234,17 +233,9 @@ func validateInputs(c *FanOutIntegration) error {
 		return fmt.Errorf("version is required")
 	}
 
-	// Subscribed inputs
-	if c.subscribedInputs == nil || (!c.subscribedInputs.DSSEnvelope && (c.subscribedInputs.Materials == nil || len(c.subscribedInputs.Materials) == 0)) {
-		return fmt.Errorf("the integration needs to subscribe to at least one input type. An envelope and/or a material")
-	}
-
-	// If you subscribe to a generic material type you can't subscribe to an specific one
-	if c.subscribedInputs.Materials != nil && len(c.subscribedInputs.Materials) > 1 {
-		for _, m := range c.subscribedInputs.Materials {
-			if m.Type == schemaapi.CraftingSchema_Material_MATERIAL_TYPE_UNSPECIFIED {
-				return fmt.Errorf("can't subscribe to specific material type since you are already subscribed to a generic one")
-			}
+	for _, m := range c.subscribedMaterials {
+		if m.Type == schemaapi.CraftingSchema_Material_MATERIAL_TYPE_UNSPECIFIED {
+			return fmt.Errorf("%s is not a valid material type", m.Type)
 		}
 	}
 
@@ -252,7 +243,12 @@ func validateInputs(c *FanOutIntegration) error {
 }
 
 // List of loaded integrations
-type AvailablePlugins []FanOut
+type AvailablePlugins []*FanOutP
+type FanOutP struct {
+	FanOut
+	DisposeFunc func()
+}
+
 type FanOutFactory = func(l log.Logger) (FanOut, error)
 
 // FindByID returns the integration with the given ID from the list of available integrations
@@ -267,6 +263,14 @@ func (i AvailablePlugins) FindByID(id string) (FanOut, error) {
 	return nil, fmt.Errorf("integration %q not found", id)
 }
 
+func (i AvailablePlugins) Cleanup() {
+	for _, plugin := range i {
+		if plugin.DisposeFunc != nil {
+			plugin.DisposeFunc()
+		}
+	}
+}
+
 type IntegrationInfo struct {
 	// Identifier of the integration
 	ID string
@@ -275,7 +279,7 @@ type IntegrationInfo struct {
 	// Integration description
 	Description string
 	// Kind of inputs does the integration expect as part of the execution
-	SubscribedInputs *Inputs
+	SubscribedMaterials []*InputMaterial
 	// Schemas in JSON schema format
 	RegistrationJSONSchema, AttachmentJSONSchema []byte
 }
@@ -285,7 +289,7 @@ func (i *FanOutIntegration) Describe() *IntegrationInfo {
 		ID:                     i.id,
 		Version:                i.version,
 		Description:            i.description,
-		SubscribedInputs:       i.subscribedInputs,
+		SubscribedMaterials:    i.subscribedMaterials,
 		RegistrationJSONSchema: i.registrationJSONSchema,
 		AttachmentJSONSchema:   i.attachmentJSONSchema,
 	}
@@ -299,6 +303,20 @@ func (i *FanOutIntegration) ValidateRegistrationRequest(jsonPayload []byte) erro
 // Validate the attachment payload against the attachment JSON schema
 func (i *FanOutIntegration) ValidateAttachmentRequest(jsonPayload []byte) error {
 	return validatePayloadAgainstJSONSchema(jsonPayload, i.attachmentJSONSchema)
+}
+
+func (i *FanOutIntegration) IsSubscribedTo(m string) bool {
+	if i.subscribedMaterials == nil {
+		return false
+	}
+
+	for _, material := range i.subscribedMaterials {
+		if material.Type.String() == m {
+			return true
+		}
+	}
+
+	return false
 }
 
 func validatePayloadAgainstJSONSchema(jsonPayload []byte, jsonSchema []byte) error {
@@ -330,39 +348,27 @@ func validatePayloadAgainstJSONSchema(jsonPayload []byte, jsonSchema []byte) err
 }
 
 func (i *FanOutIntegration) String() string {
-	inputs := i.subscribedInputs
+	inputs := i.subscribedMaterials
 
-	subscribedMaterials := make([]string, len(inputs.Materials))
-	for i, m := range inputs.Materials {
+	subscribedMaterials := make([]string, len(inputs))
+	for i, m := range inputs {
 		subscribedMaterials[i] = m.Type.String()
 	}
 
-	return fmt.Sprintf("id=%s, version=%s, expectsEnvelope=%t, expectedMaterials=%s", i.id, i.version, inputs.DSSEnvelope, subscribedMaterials)
+	return fmt.Sprintf("id=%s, version=%s, expectedMaterials=%s", i.id, i.version, subscribedMaterials)
 }
 
 type NewOpt func(*FanOutIntegration)
-
-func WithEnvelope() NewOpt {
-	return func(c *FanOutIntegration) {
-		if c.subscribedInputs == nil {
-			c.subscribedInputs = &Inputs{DSSEnvelope: true}
-		} else {
-			c.subscribedInputs.DSSEnvelope = true
-		}
-	}
-}
 
 func WithInputMaterial(materialType schemaapi.CraftingSchema_Material_MaterialType) NewOpt {
 	return func(c *FanOutIntegration) {
 		material := &InputMaterial{Type: materialType}
 
 		switch {
-		case c.subscribedInputs == nil: // Inputs is not defined
-			c.subscribedInputs = &Inputs{Materials: []*InputMaterial{material}}
-		case len(c.subscribedInputs.Materials) == 0: // Materials struct is empty
-			c.subscribedInputs.Materials = []*InputMaterial{material}
+		case len(c.subscribedMaterials) == 0: // Materials struct is empty
+			c.subscribedMaterials = []*InputMaterial{material}
 		default: // Materials struct contains data
-			c.subscribedInputs.Materials = append(c.subscribedInputs.Materials, material)
+			c.subscribedMaterials = append(c.subscribedMaterials, material)
 		}
 	}
 }

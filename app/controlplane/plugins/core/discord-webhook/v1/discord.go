@@ -65,7 +65,6 @@ func New(l log.Logger) (sdk.FanOut, error) {
 				Attachment:   attachmentRequest{},
 			},
 		},
-		sdk.WithEnvelope(),
 	)
 
 	if err != nil {
@@ -97,6 +96,9 @@ func (i *Integration) Register(_ context.Context, req *sdk.RegistrationRequest) 
 		return nil, fmt.Errorf("invalid webhook URL: %w", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("invalid webhook URL")
+	}
 
 	var webHookInfo webhookResponse
 	if err := json.NewDecoder(resp.Body).Decode(&webHookInfo); err != nil {
@@ -126,7 +128,7 @@ func (i *Integration) Attach(_ context.Context, _ *sdk.AttachmentRequest) (*sdk.
 	return &sdk.AttachmentResponse{}, nil
 }
 
-// Execute will be instantiate when either an attestation or a material has been received
+// Execute will be instantiated when either an attestation or a material has been received
 // It's up to the plugin builder to differentiate between inputs
 func (i *Integration) Execute(_ context.Context, req *sdk.ExecutionRequest) error {
 	i.Logger.Info("execution requested")
