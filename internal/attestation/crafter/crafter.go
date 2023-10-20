@@ -237,9 +237,16 @@ func (c *Crafter) LoadCraftingState() error {
 	return nil
 }
 
+type repoInfo struct {
+	commitHash              string
+	authorName, authorEmail string
+	authorWhen              time.Time
+	// TODO: add remotes
+}
+
 // Returns the current directory git commit hash if possible
 // If we are not in a git repo it will return an empty string
-func gracefulGitRepoHead(path string) (string, error) {
+func gracefulGitRepoHead(path string) (*repoInfo, error) {
 	repo, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{
 		// walk up the directory tree until we find a git repo
 		DetectDotGit: true,
@@ -247,33 +254,49 @@ func gracefulGitRepoHead(path string) (string, error) {
 
 	if err != nil {
 		if errors.Is(err, git.ErrRepositoryNotExists) {
-			return "", nil
+			return nil, nil
 		}
 
-		return "", fmt.Errorf("opening repository: %w", err)
+		return nil, fmt.Errorf("opening repository: %w", err)
+	}
+
+	remotes, _ := repo.Remotes()
+	for _, r := range remotes {
+		if r.Config().IsFirstURLLocal() {
+			continue
+		}
+
+		fmt.Println(r.Config().URLs)
 	}
 
 	head, err := repo.Head()
 	if err != nil {
 		if errors.Is(err, plumbing.ErrReferenceNotFound) {
-			return "", nil
+			return nil, nil
 		}
-		return "", fmt.Errorf("finding repo head: %w", err)
+		return nil, fmt.Errorf("finding repo head: %w", err)
 	}
 
 	commit, err := repo.CommitObject(head.Hash())
 	if err != nil {
-		return "", fmt.Errorf("finding head commit: %w", err)
+		return nil, fmt.Errorf("finding head commit: %w", err)
 	}
 
-	return commit.Hash.String(), nil
+	return &repoInfo{
+		commitHash: commit.Hash.String(), authorName: commit.Author.Name, authorEmail: commit.Author.Email, authorWhen: commit.Author.When,
+	}, nil
 }
 
 func initialCraftingState(cwd string, schema *schemaapi.CraftingSchema, wf *api.WorkflowMetadata, dryRun bool, runnerType schemaapi.CraftingSchema_Runner_RunnerType, jobURL string) (*api.CraftingState, error) {
 	// Get git commit hash
-	commitHash, err := gracefulGitRepoHead(cwd)
+	head, err := gracefulGitRepoHead(cwd)
 	if err != nil {
 		return nil, fmt.Errorf("getting git commit hash: %w", err)
+	}
+
+	var sha1Commit string
+	if head != nil {
+		sha1Commit = head.commitHash
 	}
 
 	// Generate Crafting state
@@ -284,7 +307,7 @@ func initialCraftingState(cwd string, schema *schemaapi.CraftingSchema, wf *api.
 			Workflow:      wf,
 			RunnerType:    runnerType,
 			RunnerUrl:     jobURL,
-			Sha1Commit:    commitHash,
+			Sha1Commit:    sha1Commit,
 		},
 		DryRun: dryRun,
 	}, nil

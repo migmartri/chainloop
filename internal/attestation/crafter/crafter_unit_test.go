@@ -34,6 +34,11 @@ type crafterUnitSuite struct {
 }
 
 func (s *crafterUnitSuite) TestGitRepoHead() {
+	const (
+		authorName = "John Doe"
+		authorMail = "john@doe.org"
+	)
+
 	initRepo := func(withCommit bool) func(string) (string, error) {
 		return func(repoPath string) (string, error) {
 			repo, err := git.PlainInit(repoPath, false)
@@ -59,8 +64,8 @@ func (s *crafterUnitSuite) TestGitRepoHead() {
 
 				h, err := wt.Commit("test commit", &git.CommitOptions{
 					Author: &object.Signature{
-						Name:  "John Doe",
-						Email: "john@doe.org",
+						Name:  authorName,
+						Email: authorMail,
 						When:  time.Now(),
 					},
 				})
@@ -79,7 +84,7 @@ func (s *crafterUnitSuite) TestGitRepoHead() {
 		name          string
 		repoProvider  func(string) (string, error)
 		wantErr       bool
-		wantEmptyHash bool
+		wantEmptyHead bool
 	}{
 		{
 			name:         "happy path",
@@ -88,11 +93,11 @@ func (s *crafterUnitSuite) TestGitRepoHead() {
 		{
 			name:          "empty repo",
 			repoProvider:  initRepo(false),
-			wantEmptyHash: true,
+			wantEmptyHead: true,
 		},
 		{
 			name:          "not a repository",
-			wantEmptyHash: true,
+			wantEmptyHead: true,
 		},
 	}
 
@@ -112,14 +117,15 @@ func (s *crafterUnitSuite) TestGitRepoHead() {
 				return
 			}
 
-			if tc.wantEmptyHash {
+			assert.NoError(s.T(), err)
+			if tc.wantEmptyHead {
 				assert.Empty(s.T(), got)
 			} else {
 				assert.NotEmpty(s.T(), got)
+				assert.Equal(s.T(), wantDigest, got.commitHash)
+				assert.Equal(s.T(), authorName, got.authorName)
+				assert.Equal(s.T(), got.authorEmail, got.authorEmail)
 			}
-
-			assert.NoError(s.T(), err)
-			assert.Equal(s.T(), wantDigest, got)
 		})
 	}
 }
