@@ -51,6 +51,7 @@ type Opts struct {
 	CASBackendUseCase   *biz.CASBackendUseCase
 	CASClientUseCase    *biz.CASClientUseCase
 	IntegrationUseCase  *biz.IntegrationUseCase
+	ReferrerUseCase     *biz.ReferrerUseCase
 	// Services
 	WorkflowSvc         *service.WorkflowService
 	AuthSvc             *service.AuthService

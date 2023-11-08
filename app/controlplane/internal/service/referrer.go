@@ -38,7 +38,12 @@ func NewReferrerService(uc *biz.ReferrerUseCase, opts ...NewOpt) *ReferrerServic
 }
 
 func (s *ReferrerService) Discover(ctx context.Context, req *pb.ReferrerServiceDiscoverRequest) (*pb.ReferrerServiceDiscoverResponse, error) {
-	res, err := s.referrerUC.GetFromRoot(ctx, req.GetDigest())
+	currentUser, _, err := loadCurrentUserAndOrg(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := s.referrerUC.GetFromRoot(ctx, req.GetDigest(), currentUser.ID)
 	if err != nil {
 		return nil, handleUseCaseErr("referrer discovery", err, s.log)
 	}

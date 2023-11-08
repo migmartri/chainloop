@@ -20,9 +20,14 @@ package controlplane.v1;
 option go_package = "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1;v1";
 import "validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
 
 service ReferrerService {
-	rpc Discover (ReferrerServiceDiscoverRequest) returns (ReferrerServiceDiscoverResponse);
+	rpc Discover (ReferrerServiceDiscoverRequest) returns (ReferrerServiceDiscoverResponse) {
+		option (google.api.http) = {
+        get: "/discover/{digest}"
+    };
+  }
 }
 
 message ReferrerServiceDiscoverRequest {
