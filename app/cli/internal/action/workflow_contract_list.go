@@ -19,12 +19,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 	schemav1 "github.com/chainloop-dev/chainloop/app/controlplane/api/workflowcontract/v1"
 )
 
 type WorkflowContractList struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type WorkflowContractItem struct {
@@ -42,7 +43,7 @@ type WorkflowContractVersionItem struct {
 	BodyV1    *schemav1.CraftingSchema `json:"bodyV1"`
 }
 
-func NewWorkflowContractList(cfg *ActionsOpts) *WorkflowContractList {
+func NewWorkflowContractList(cfg *action.ActionsOpts) *WorkflowContractList {
 	return &WorkflowContractList{cfg}
 }
 

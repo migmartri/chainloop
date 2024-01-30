@@ -19,14 +19,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type ReferrerDiscover struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 type ReferrerDiscoverPublic struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type ReferrerItem struct {
@@ -40,7 +41,7 @@ type ReferrerItem struct {
 	Annotations  map[string]string `json:"annotations,omitempty"`
 }
 
-func NewReferrerDiscoverPrivate(cfg *ActionsOpts) *ReferrerDiscover {
+func NewReferrerDiscoverPrivate(cfg *action.ActionsOpts) *ReferrerDiscover {
 	return &ReferrerDiscover{cfg}
 }
 
@@ -56,7 +57,7 @@ func (action *ReferrerDiscover) Run(ctx context.Context, digest, kind string) (*
 	return pbReferrerItemToAction(resp.Result), nil
 }
 
-func NewReferrerDiscoverPublicIndex(cfg *ActionsOpts) *ReferrerDiscoverPublic {
+func NewReferrerDiscoverPublicIndex(cfg *action.ActionsOpts) *ReferrerDiscoverPublic {
 	return &ReferrerDiscoverPublic{cfg}
 }
 

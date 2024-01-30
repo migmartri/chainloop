@@ -55,20 +55,20 @@ func NewAttestationPush(cfg *AttestationPushOpts) *AttestationPush {
 	}
 }
 
-func (action *AttestationPush) Run(runtimeAnnotations map[string]string) (*AttestationResult, error) {
-	if initialized := action.c.AlreadyInitialized(); !initialized {
+func (a *AttestationPush) Run(runtimeAnnotations map[string]string) (*AttestationResult, error) {
+	if initialized := a.c.AlreadyInitialized(); !initialized {
 		return nil, ErrAttestationNotInitialized
 	}
 
-	if err := action.c.LoadCraftingState(); err != nil {
-		action.Logger.Err(err).Msg("loading existing attestation")
+	if err := a.c.LoadCraftingState(); err != nil {
+		a.Logger.Err(err).Msg("loading existing attestation")
 		return nil, err
 	}
 
 	// Annotations
 	craftedAnnotations := make(map[string]string, 0)
 	// 1 - Set annotations that come from the contract
-	for _, v := range action.c.CraftingState.InputSchema.GetAnnotations() {
+	for _, v := range a.c.CraftingState.InputSchema.GetAnnotations() {
 		craftedAnnotations[v.Name] = v.Value
 	}
 
@@ -84,7 +84,7 @@ func (action *AttestationPush) Run(runtimeAnnotations map[string]string) (*Attes
 			craftedAnnotations[kr] = vr
 		} else {
 			// NOTE: we do not allow overriding values that come from the contract
-			action.Logger.Info().Str("annotation", kr).Msg("annotation can't be changed, skipping")
+			a.Logger.Info().Str("annotation", kr).Msg("annotation can't be changed, skipping")
 		}
 	}
 
@@ -101,18 +101,18 @@ func (action *AttestationPush) Run(runtimeAnnotations map[string]string) (*Attes
 		}
 	}
 	// Set the annotations
-	action.c.CraftingState.Attestation.Annotations = craftedAnnotations
+	a.c.CraftingState.Attestation.Annotations = craftedAnnotations
 
-	if err := action.c.ValidateAttestation(); err != nil {
+	if err := a.c.ValidateAttestation(); err != nil {
 		return nil, err
 	}
 
-	action.Logger.Debug().Msg("validation completed")
+	a.Logger.Debug().Msg("validation completed")
 
 	// Indicate that we are done with the attestation
-	action.c.CraftingState.Attestation.FinishedAt = timestamppb.New(time.Now())
+	a.c.CraftingState.Attestation.FinishedAt = timestamppb.New(time.Now())
 
-	renderer, err := renderer.NewAttestationRenderer(action.c.CraftingState, action.keyPath, action.cliVersion, action.cliDigest, renderer.WithLogger(action.Logger))
+	renderer, err := renderer.NewAttestationRenderer(a.c.CraftingState, a.keyPath, a.cliVersion, a.cliDigest, renderer.WithLogger(a.Logger))
 	if err != nil {
 		return nil, err
 	}
@@ -124,26 +124,26 @@ func (action *AttestationPush) Run(runtimeAnnotations map[string]string) (*Attes
 
 	attestationResult := &AttestationResult{Envelope: envelope}
 
-	action.Logger.Debug().Msg("render completed")
-	if action.c.CraftingState.DryRun {
-		action.Logger.Info().Msg("dry-run completed, push skipped")
+	a.Logger.Debug().Msg("render completed")
+	if a.c.CraftingState.DryRun {
+		a.Logger.Info().Msg("dry-run completed, push skipped")
 		// We are done, remove the existing att state
-		if err := action.c.Reset(); err != nil {
+		if err := a.c.Reset(); err != nil {
 			return nil, err
 		}
 
 		return attestationResult, nil
 	}
 
-	attestationResult.Digest, err = pushToControlPlane(action.ActionsOpts.CPConnection, envelope, action.c.CraftingState.Attestation.GetWorkflow().GetWorkflowRunId())
+	attestationResult.Digest, err = pushToControlPlane(a.ActionsOpts.CPConnection, envelope, a.c.CraftingState.Attestation.GetWorkflow().GetWorkflowRunId())
 	if err != nil {
 		return nil, fmt.Errorf("pushing to control plane: %w", err)
 	}
 
-	action.Logger.Info().Msg("push completed")
+	a.Logger.Info().Msg("push completed")
 
 	// We are done, remove the existing att state
-	if err := action.c.Reset(); err != nil {
+	if err := a.c.Reset(); err != nil {
 		return nil, err
 	}
 

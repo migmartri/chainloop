@@ -19,14 +19,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type ConfigCurrentContext struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
-func NewConfigCurrentContext(cfg *ActionsOpts) *ConfigCurrentContext {
+func NewConfigCurrentContext(cfg *action.ActionsOpts) *ConfigCurrentContext {
 	return &ConfigCurrentContext{cfg}
 }
 

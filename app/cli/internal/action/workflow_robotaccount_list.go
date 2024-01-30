@@ -19,11 +19,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type WorkflowRobotAccountList struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type WorkflowRobotAccountItem struct {
@@ -36,7 +37,7 @@ type WorkflowRobotAccountItem struct {
 	RevokedAt *time.Time `json:"revokedAt,omitempty"`
 }
 
-func NewWorkflowRobotAccountList(cfg *ActionsOpts) *WorkflowRobotAccountList {
+func NewWorkflowRobotAccountList(cfg *action.ActionsOpts) *WorkflowRobotAccountList {
 	return &WorkflowRobotAccountList{cfg}
 }
 

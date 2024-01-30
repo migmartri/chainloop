@@ -22,6 +22,7 @@ import (
 	"io"
 	"os"
 
+	caction "github.com/chainloop-dev/chainloop/app/cli/action"
 	"github.com/chainloop-dev/chainloop/app/cli/internal/action"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
@@ -32,7 +33,7 @@ const formatTable = "table"
 // Supported list of tabulated data that can be rendered as a table
 type tabulatedData interface {
 	[]*action.WorkflowItem |
-		*action.AttestationStatusResult |
+		*caction.AttestationStatusResult |
 		[]*action.WorkflowRobotAccountItem |
 		[]*action.WorkflowRunItem |
 		*action.WorkflowRunItemFull |

@@ -20,11 +20,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type WorkflowList struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type WorkflowItem struct {
@@ -48,7 +49,7 @@ type WorkflowItemWithRobotAccount struct {
 	RobotAccountKey string `json:"robotAccountKey,omitempty"`
 }
 
-func NewWorkflowList(cfg *ActionsOpts) *WorkflowList {
+func NewWorkflowList(cfg *action.ActionsOpts) *WorkflowList {
 	return &WorkflowList{cfg}
 }
 

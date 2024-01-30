@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 
 	"github.com/adrg/xdg"
-	"github.com/chainloop-dev/chainloop/app/cli/internal/action"
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	"github.com/chainloop-dev/chainloop/internal/grpcconn"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"

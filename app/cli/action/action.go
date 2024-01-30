@@ -17,8 +17,16 @@ package action
 
 import (
 	"time"
+
+	"github.com/rs/zerolog"
+	"google.golang.org/grpc"
 )
 
-func toTimePtr(t time.Time) *time.Time {
+func ToTimePtr(t time.Time) *time.Time {
 	return &t
+}
+
+type ActionsOpts struct {
+	CPConnection *grpc.ClientConn
+	Logger       zerolog.Logger
 }

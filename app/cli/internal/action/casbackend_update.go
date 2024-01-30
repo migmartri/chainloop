@@ -19,12 +19,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type CASBackendUpdate struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type NewCASBackendUpdateOpts struct {
@@ -34,7 +35,7 @@ type NewCASBackendUpdateOpts struct {
 	Credentials map[string]any
 }
 
-func NewCASBackendUpdate(cfg *ActionsOpts) *CASBackendUpdate {
+func NewCASBackendUpdate(cfg *action.ActionsOpts) *CASBackendUpdate {
 	return &CASBackendUpdate{cfg}
 }
 

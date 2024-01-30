@@ -18,11 +18,12 @@ package action
 import (
 	"context"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type WorkflowContractDescribe struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type WorkflowContractWithVersionItem struct {
@@ -30,7 +31,7 @@ type WorkflowContractWithVersionItem struct {
 	Revision *WorkflowContractVersionItem `json:"revision"`
 }
 
-func NewWorkflowContractDescribe(cfg *ActionsOpts) *WorkflowContractDescribe {
+func NewWorkflowContractDescribe(cfg *action.ActionsOpts) *WorkflowContractDescribe {
 	return &WorkflowContractDescribe{cfg}
 }
 

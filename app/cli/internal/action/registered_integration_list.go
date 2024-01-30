@@ -21,11 +21,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type RegisteredIntegrationList struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type RegisteredIntegrationItem struct {
@@ -38,7 +39,7 @@ type RegisteredIntegrationItem struct {
 	Config      map[string]interface{} `json:"config"`
 }
 
-func NewRegisteredIntegrationList(cfg *ActionsOpts) *RegisteredIntegrationList {
+func NewRegisteredIntegrationList(cfg *action.ActionsOpts) *RegisteredIntegrationList {
 	return &RegisteredIntegrationList{cfg}
 }
 

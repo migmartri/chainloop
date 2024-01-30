@@ -19,14 +19,15 @@ import (
 	"context"
 	"errors"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type WorkflowRobotAccountCreate struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
-func NewWorkflowRobotAccountCreate(cfg *ActionsOpts) *WorkflowRobotAccountCreate {
+func NewWorkflowRobotAccountCreate(cfg *action.ActionsOpts) *WorkflowRobotAccountCreate {
 	return &WorkflowRobotAccountCreate{cfg}
 }
 

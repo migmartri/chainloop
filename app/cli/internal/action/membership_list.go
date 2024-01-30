@@ -19,11 +19,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type MembershipList struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type OrgItem struct {
@@ -39,7 +40,7 @@ type MembershipItem struct {
 	Org       *OrgItem
 }
 
-func NewMembershipList(cfg *ActionsOpts) *MembershipList {
+func NewMembershipList(cfg *action.ActionsOpts) *MembershipList {
 	return &MembershipList{cfg}
 }
 

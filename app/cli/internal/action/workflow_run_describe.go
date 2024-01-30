@@ -17,10 +17,12 @@ package action
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 	"github.com/chainloop-dev/chainloop/internal/attestation/renderer/chainloop"
 	sigs "github.com/sigstore/cosign/v2/pkg/signature"
@@ -31,7 +33,7 @@ import (
 )
 
 type WorkflowRunDescribe struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type WorkflowRunItemFull struct {
@@ -76,7 +78,7 @@ func (i *WorkflowRunAttestationItem) Statement() *intoto.Statement {
 	return i.statement
 }
 
-func NewWorkflowRunDescribe(cfg *ActionsOpts) *WorkflowRunDescribe {
+func NewWorkflowRunDescribe(cfg *action.ActionsOpts) *WorkflowRunDescribe {
 	return &WorkflowRunDescribe{cfg}
 }
 
@@ -209,4 +211,13 @@ func verifyEnvelope(ctx context.Context, e *dsse.Envelope, publicKey string) err
 
 	_, err = dsseVerifier.Verify(ctx, e)
 	return err
+}
+
+func decodeEnvelope(rawEnvelope []byte) (*dsse.Envelope, error) {
+	envelope := &dsse.Envelope{}
+	if err := json.Unmarshal(rawEnvelope, envelope); err != nil {
+		return nil, err
+	}
+
+	return envelope, nil
 }

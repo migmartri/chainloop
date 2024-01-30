@@ -57,6 +57,27 @@ type AttestationStatusResultMaterial struct {
 	Set, IsOutput, Required bool
 }
 
+type Material struct {
+	Name           string        `json:"name"`
+	Value          string        `json:"value"`
+	Hash           string        `json:"hash"`
+	Filename       string        `json:"filename"`
+	Type           string        `json:"type"`
+	Annotations    []*Annotation `json:"annotations,omitempty"`
+	UploadedToCAS  bool          `json:"uploadedToCAS,omitempty"`
+	EmbeddedInline bool          `json:"embeddedInline,omitempty"`
+}
+
+type EnvVar struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type Annotation struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
 func NewAttestationStatus(cfg *AttestationStatusOpts) *AttestationStatus {
 	return &AttestationStatus{
 		ActionsOpts: cfg.ActionsOpts,
@@ -88,7 +109,7 @@ func (action *AttestationStatus) Run() (*AttestationStatusResult, error) {
 			Team:             workflowMeta.GetTeam(),
 			ContractRevision: workflowMeta.GetSchemaRevision(),
 		},
-		InitializedAt: toTimePtr(att.InitializedAt.AsTime()),
+		InitializedAt: ToTimePtr(att.InitializedAt.AsTime()),
 		DryRun:        c.CraftingState.DryRun,
 		Annotations:   pbAnnotationsToAction(c.CraftingState.InputSchema.GetAnnotations()),
 	}

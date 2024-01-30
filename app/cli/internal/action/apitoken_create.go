@@ -21,15 +21,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 type APITokenCreate struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
-func NewAPITokenCreate(cfg *ActionsOpts) *APITokenCreate {
+func NewAPITokenCreate(cfg *action.ActionsOpts) *APITokenCreate {
 	return &APITokenCreate{cfg}
 }
 

@@ -19,14 +19,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type APITokenRevoke struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
-func NewAPITokenRevoke(cfg *ActionsOpts) *APITokenRevoke {
+func NewAPITokenRevoke(cfg *action.ActionsOpts) *APITokenRevoke {
 	return &APITokenRevoke{cfg}
 }
 

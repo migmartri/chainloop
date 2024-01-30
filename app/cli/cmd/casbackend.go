@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 
+	actionc "github.com/chainloop-dev/chainloop/app/cli/action"
 	"github.com/chainloop-dev/chainloop/app/cli/internal/action"
 	"github.com/spf13/cobra"
 )
@@ -60,7 +61,7 @@ func newCASBackendUpdateCmd() *cobra.Command {
 
 // confirmDefaultCASBackendOverride asks the user to confirm the override of the default CAS backend
 // in the event that there is one already set and its not the same as the one we are setting
-func confirmDefaultCASBackendOverride(actionOpts *action.ActionsOpts, id string) (bool, error) {
+func confirmDefaultCASBackendOverride(actionOpts *actionc.ActionsOpts, id string) (bool, error) {
 	// get existing backends
 	backends, err := action.NewCASBackendList(actionOpts).Run()
 	if err != nil {
@@ -86,11 +87,11 @@ func confirmDefaultCASBackendOverride(actionOpts *action.ActionsOpts, id string)
 }
 
 // If we are removing the default we confirm too
-func confirmDefaultCASBackendRemoval(actionOpts *action.ActionsOpts, id string) (bool, error) {
+func confirmDefaultCASBackendRemoval(actionOpts *actionc.ActionsOpts, id string) (bool, error) {
 	return confirmDefaultCASBackendUnset(id, "You are deleting the default CAS backend.", actionOpts)
 }
 
-func confirmDefaultCASBackendUnset(id, msg string, actionOpts *action.ActionsOpts) (bool, error) {
+func confirmDefaultCASBackendUnset(id, msg string, actionOpts *actionc.ActionsOpts) (bool, error) {
 	// get existing backends
 	backends, err := action.NewCASBackendList(actionOpts).Run()
 	if err != nil {

@@ -21,6 +21,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	"github.com/chainloop-dev/chainloop/internal/casclient"
 	"github.com/jedib0t/go-pretty/v6/progress"
 	"google.golang.org/grpc"
@@ -31,12 +32,12 @@ type CASArtifact struct {
 }
 
 type ArtifactUpload struct {
-	*ActionsOpts
+	*action.ActionsOpts
 	artifactsCASConn *grpc.ClientConn
 }
 
 type ArtifactUploadOpts struct {
-	*ActionsOpts
+	*action.ActionsOpts
 	ArtifactsCASConn *grpc.ClientConn
 }
 

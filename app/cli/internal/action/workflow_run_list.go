@@ -19,12 +19,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 	v1 "github.com/chainloop-dev/chainloop/app/controlplane/api/workflowcontract/v1"
 )
 
 type WorkflowRunList struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type WorkflowRunItem struct {
@@ -44,7 +45,7 @@ type PaginatedWorkflowRunItem struct {
 	PaginationMeta *PaginationOpts
 }
 
-func NewWorkflowRunList(cfg *ActionsOpts) *WorkflowRunList {
+func NewWorkflowRunList(cfg *action.ActionsOpts) *WorkflowRunList {
 	return &WorkflowRunList{cfg}
 }
 

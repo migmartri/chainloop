@@ -19,11 +19,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/chainloop-dev/chainloop/app/cli/action"
 	pb "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
 )
 
 type OrgInvitationListSent struct {
-	cfg *ActionsOpts
+	cfg *action.ActionsOpts
 }
 
 type OrgInvitationItem struct {
@@ -35,7 +36,7 @@ type OrgInvitationItem struct {
 	CreatedAt     *time.Time `json:"createdAt"`
 }
 
-func NewOrgInvitationListSent(cfg *ActionsOpts) *OrgInvitationListSent {
+func NewOrgInvitationListSent(cfg *action.ActionsOpts) *OrgInvitationListSent {
 	return &OrgInvitationListSent{cfg}
 }
 
