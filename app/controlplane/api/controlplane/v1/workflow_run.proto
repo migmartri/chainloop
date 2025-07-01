@@ -162,6 +162,7 @@ message AttestationServiceStoreResponse {
   message Result {
     // attestation digest
     string digest = 2;
+    bytes attestation_bundle = 3;
   }
 }
 

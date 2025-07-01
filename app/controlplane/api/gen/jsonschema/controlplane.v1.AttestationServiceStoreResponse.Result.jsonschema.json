@@ -2,7 +2,17 @@
   "$id": "controlplane.v1.AttestationServiceStoreResponse.Result.jsonschema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
+  "patternProperties": {
+    "^(attestation_bundle)$": {
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    }
+  },
   "properties": {
+    "attestationBundle": {
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "type": "string"
+    },
     "digest": {
       "description": "attestation digest",
       "type": "string"

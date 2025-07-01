@@ -142,6 +142,7 @@ export interface AttestationServiceStoreResponse {
 export interface AttestationServiceStoreResponse_Result {
   /** attestation digest */
   digest: string;
+  attestationBundle: Uint8Array;
 }
 
 export interface AttestationServiceCancelRequest {
@@ -1600,13 +1601,16 @@ export const AttestationServiceStoreResponse = {
 };
 
 function createBaseAttestationServiceStoreResponse_Result(): AttestationServiceStoreResponse_Result {
-  return { digest: "" };
+  return { digest: "", attestationBundle: new Uint8Array(0) };
 }
 
 export const AttestationServiceStoreResponse_Result = {
   encode(message: AttestationServiceStoreResponse_Result, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.digest !== "") {
       writer.uint32(18).string(message.digest);
+    }
+    if (message.attestationBundle.length !== 0) {
+      writer.uint32(26).bytes(message.attestationBundle);
     }
     return writer;
   },
@@ -1625,6 +1629,13 @@ export const AttestationServiceStoreResponse_Result = {
 
           message.digest = reader.string();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.attestationBundle = reader.bytes();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1635,12 +1646,21 @@ export const AttestationServiceStoreResponse_Result = {
   },
 
   fromJSON(object: any): AttestationServiceStoreResponse_Result {
-    return { digest: isSet(object.digest) ? String(object.digest) : "" };
+    return {
+      digest: isSet(object.digest) ? String(object.digest) : "",
+      attestationBundle: isSet(object.attestationBundle)
+        ? bytesFromBase64(object.attestationBundle)
+        : new Uint8Array(0),
+    };
   },
 
   toJSON(message: AttestationServiceStoreResponse_Result): unknown {
     const obj: any = {};
     message.digest !== undefined && (obj.digest = message.digest);
+    message.attestationBundle !== undefined &&
+      (obj.attestationBundle = base64FromBytes(
+        message.attestationBundle !== undefined ? message.attestationBundle : new Uint8Array(0),
+      ));
     return obj;
   },
 
@@ -1655,6 +1675,7 @@ export const AttestationServiceStoreResponse_Result = {
   ): AttestationServiceStoreResponse_Result {
     const message = createBaseAttestationServiceStoreResponse_Result();
     message.digest = object.digest ?? "";
+    message.attestationBundle = object.attestationBundle ?? new Uint8Array(0);
     return message;
   },
 };
