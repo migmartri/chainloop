@@ -28,3 +28,4 @@ jobs:
             Feel free to reopen if it is still relevant.
           exempt-issue-labels: pinned,security
           exempt-pr-labels: pinned,security
+          repo-token: ${{ secrets.PAT_STALE_ACTION }}
