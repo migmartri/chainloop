@@ -10,7 +10,7 @@ spec:
       - ref: check-compliance-requirement
         with:
           requirement_name: sbom-compliance
-        gate: true
+        gate: true # https://docs.chainloop.dev/concepts/policies#configuring-phases-in-a-policy-spec
         attestation_phases:
           - INIT
       - ref: source-commit
