@@ -63,6 +63,8 @@ type SupportedRunner interface {
 	// attestationViewURL is an optional URL to view the attestation details.
 	// Returns nil if platform doesn't support reporting.
 	Report(tableOutput []byte, attestationViewURL string) error
+
+	FederatedToken() string
 }
 
 type RunnerM map[schemaapi.CraftingSchema_Runner_RunnerType]SupportedRunner
@@ -96,8 +98,8 @@ var RunnerFactories = map[schemaapi.CraftingSchema_Runner_RunnerType]RunnerFacto
 	schemaapi.CraftingSchema_Runner_TEAMCITY_PIPELINE: func(_ string, _ *zerolog.Logger) SupportedRunner {
 		return runners.NewTeamCityPipeline()
 	},
-	schemaapi.CraftingSchema_Runner_TEKTON_PIPELINE: func(_ string, _ *zerolog.Logger) SupportedRunner {
-		return runners.NewTektonPipeline()
+	schemaapi.CraftingSchema_Runner_TEKTON_PIPELINE: func(_ string, logger *zerolog.Logger) SupportedRunner {
+		return runners.NewTektonPipeline(timeoutCtx, logger)
 	},
 }
 

@@ -183,7 +183,8 @@ OIDC settings, will fallback to development settings if needed
 {{- define "controlplane.oidc_settings" -}}
   {{- if .Values.development }}
     {{- with .Values.controlplane.auth }}
-    {{- $dexContext := dict "Values" $.Values.dex "Chart" $.Chart "Release" $.Release "Capabilities" $.Capabilities "Template" $.Template }}
+    {{- $dexChart := dict "Name" "dex" }}
+    {{- $dexContext := dict "Values" $.Values.dex "Chart" $dexChart "Release" $.Release "Capabilities" $.Capabilities "Template" $.Template }}
     domain: "{{ coalesce .oidc.url (include "chainloop.dex.external_url" $dexContext ) }}"
     client_id: "{{ coalesce .oidc.clientID "chainloop-dev" }}"
     client_secret: "{{ coalesce .oidc.clientSecret "ZXhhbXBsZS1hcHAtc2VjcmV0" }}"
@@ -328,6 +329,22 @@ null
 {{- end -}}
 {{- end -}}
 
+{{/*
+External gRPC URL the controlplane API can be reached at
+This endpoint is used by the CLI to connect via gRPC
+NOTE: Load balancer service type is not supported
+*/}}
+{{- define "chainloop.controlplane.external_grpc_url" -}}
+{{- $service := .Values.controlplane.serviceAPI }}
+{{- $ingress := .Values.controlplane.ingressAPI }}
+
+{{- if (and $ingress $ingress.enabled $ingress.hostname) }}
+{{- printf "%s:%s" $ingress.hostname (ternary "443" "80" $ingress.tls) }}
+{{- else if (and (eq $service.type "NodePort") $service.nodePorts (not (empty $service.nodePorts.http))) }}
+{{- printf "localhost:%s" $service.nodePorts.http }}
+{{- end -}}
+{{- end -}}
+
 {{- define "chainloop.sentry" -}}
 observability:
   sentry:
@@ -414,6 +431,22 @@ NOTE: Load balancer service type is not supported
 {{- printf "%s://%s" (ternary "https" "http" $ingress.tls ) $ingress.hostname }}
 {{- else if (and (eq $service.type "NodePort") $service.nodePorts (not (empty $service.nodePorts.http))) }}
 {{- printf "http://localhost:%s" $service.nodePorts.http }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+External gRPC URL the CAS API can be reached at
+This endpoint is used by the CLI to connect via gRPC
+NOTE: Load balancer service type is not supported
+*/}}
+{{- define "chainloop.cas.external_grpc_url" -}}
+{{- $service := .Values.cas.serviceAPI }}
+{{- $ingress := .Values.cas.ingressAPI }}
+
+{{- if (and $ingress $ingress.enabled $ingress.hostname) }}
+{{- printf "%s:%s" $ingress.hostname (ternary "443" "80" $ingress.tls) }}
+{{- else if (and (eq $service.type "NodePort") $service.nodePorts (not (empty $service.nodePorts.http))) }}
+{{- printf "localhost:%s" $service.nodePorts.http }}
 {{- end -}}
 {{- end -}}
 

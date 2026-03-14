@@ -33,6 +33,7 @@ import (
 	"github.com/chainloop-dev/chainloop/app/cli/pkg/action"
 	"github.com/chainloop-dev/chainloop/app/cli/pkg/plugins"
 	v1 "github.com/chainloop-dev/chainloop/app/controlplane/api/controlplane/v1"
+	"github.com/chainloop-dev/chainloop/pkg/attestation/crafter"
 	"github.com/chainloop-dev/chainloop/pkg/grpcconn"
 	"github.com/chainloop-dev/chainloop/pkg/policies/engine/builtins"
 	"github.com/rs/zerolog"
@@ -66,7 +67,8 @@ const (
 	// Follow the convention stated on https://consoledonottrack.com/
 	doNotTrackEnv = "DO_NOT_TRACK"
 
-	trueString = "true"
+	trueString                      = "true"
+	supportsFederatedAuthAnnotation = "supportsFederatedAuth"
 )
 
 var telemetryWg sync.WaitGroup
@@ -119,6 +121,17 @@ func NewRootCmd(l zerolog.Logger) *cobra.Command {
 				return err
 			}
 
+			// If the auth token is not set and the command supports federated auth, we try to discover the runner and use the federated token for the runner if available
+			if authToken == "" && cmdSupportsFederatedAuth(cmd) {
+				r := crafter.DiscoverRunner(authToken, logger)
+				if r.IsAuthenticated() && r.FederatedToken() != "" {
+					logger.Debug().Str("runner", r.ID().String()).Msg("using federated auth token")
+					authToken = r.FederatedToken()
+					// reset isUserToken to false because we are using a federated token and we don't want to ask for confirmation
+					isUserToken = false
+				}
+			}
+
 			var opts = []grpcconn.Option{
 				grpcconn.WithInsecure(apiInsecure()),
 			}
@@ -157,7 +170,7 @@ func NewRootCmd(l zerolog.Logger) *cobra.Command {
 			}
 
 			// Warn users when the session is interactive, and the operation is supposed to use an API token instead
-			if shouldAskForConfirmation(cmd) && isUserToken && !flagYes {
+			if shouldAskForConfirmation(cmd) && authToken != "" && isUserToken && !flagYes {
 				logger.Warn().Msg("User-attended mode detected. This is intended for local testing only. For CI/CD or automated workflows, please use an API token.")
 				if !confirmationPrompt(fmt.Sprintf("This command will run against the organization %q", orgName)) {
 					return errors.New("command canceled by user")
@@ -495,6 +508,10 @@ func shouldAskForConfirmation(cmd *cobra.Command) bool {
 
 func isAPITokenPreferred(cmd *cobra.Command) bool {
 	return cmd.Annotations[useAPIToken] == trueString
+}
+
+func cmdSupportsFederatedAuth(cmd *cobra.Command) bool {
+	return cmd.Annotations[supportsFederatedAuthAnnotation] == trueString
 }
 
 func getConfigDir(appName string) string {
