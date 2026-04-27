@@ -159,6 +159,10 @@ Chainloop is developed in the open and is constantly improved by our users, cont
 - [Slack](https://join.slack.com/t/chainloop-community/shared_invite/zt-2k34dvx3r-u85uGP_KiLC6ic5Wy4aRnQ)
 - Youtube [Channel](https://www.youtube.com/channel/UCISrWrPyR_AFjIQYmxAyKdg)
 
+## Fun Fact
+
+The name "Chainloop" comes from the idea of creating a continuous, unbroken chain of trust across your entire software supply chain — a loop of verifiable evidence from source to deployment.
+
 ## Contributing
 
 Want to get involved? Contributions are welcome.
