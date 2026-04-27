@@ -190,6 +190,10 @@ If you are using Chainloop in your organization and want to be listed here, plea
 
 Take a look at the list of [releases](http://github.com/chainloop-dev/chainloop/releases) to stay tuned for the latest features and changes.
 
+## Acknowledgements
+
+Chainloop builds on the shoulders of great open-source projects including [Sigstore](https://www.sigstore.dev/), [in-toto](https://in-toto.io/), [Open Policy Agent](https://www.openpolicyagent.org/), and [SLSA](https://slsa.dev). We are grateful to these communities for their work.
+
 ## License
 
 Chainloop is released under the Apache License, Version 2.0. Please see the [LICENSE](./LICENSE.md) file for more information.
