@@ -172,6 +172,10 @@ our [Contribution](CONTRIBUTING.md) page. At all times, follow our [Code of Cond
 
 See the [issue tracker](https://github.com/chainloop-dev/chainloop/issues) if you're unsure where to start, especially the [Good first issue](https://github.com/chainloop-dev/chainloop/labels/good%20first%20issue) label.
 
+## Adopters
+
+If you are using Chainloop in your organization and want to be listed here, please open a pull request!
+
 ## Changelog
 
 Take a look at the list of [releases](http://github.com/chainloop-dev/chainloop/releases) to stay tuned for the latest features and changes.
