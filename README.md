@@ -86,6 +86,12 @@ Chainloop supports the collection of the following list of evidence types. For t
 - Custom Evidence Type: Custom piece of evidence that doesn't fit in any other category, for instance, an approval report in json format, etc.
 - Key-Value metadata pairs
 
+## Requirements
+
+- Kubernetes 1.25+ (for self-hosted deployments)
+- PostgreSQL 16+
+- An OIDC-compatible identity provider
+
 ## Getting started
 
 Follow the [quickstart](https://docs.chainloop.dev/quickstart) or the [getting started guide](https://docs.chainloop.dev/get-started) for detailed information on a) how to download and configure the Chainloop CLI and b) how to deploy Chainloop on your Kubernetes Cluster.
