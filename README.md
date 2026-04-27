@@ -151,6 +151,10 @@ Once you've been logged in, follow [these instructions](https://docs.chainloop.d
 
 To learn more, please visit the Chainloop project's documentation website, https://docs.chainloop.dev where you will find a getting started guide, FAQ, examples, and more.
 
+## Security
+
+Chainloop takes security seriously. If you discover a security vulnerability, please report it responsibly by emailing security@chainloop.dev instead of opening a public issue.
+
 ## Community / Discussion / Support
 
 Chainloop is developed in the open and is constantly improved by our users, contributors and maintainers. Got a question, comment, or idea? Please don't hesitate to reach out via:
