@@ -46,7 +46,7 @@ func (r *ProjectVersionRepo) FindByProjectAndVersion(ctx context.Context, projec
 	ctx, span := otelx.Start(ctx, projectVersionRepoTracer, "ProjectVersionRepo.FindByProjectAndVersion")
 	defer span.End()
 
-	pv, err := r.data.DB.ProjectVersion.Query().Where(projectversion.HasProjectWith(project.ID(projectID)), projectversion.VersionEQ(version)).Only(ctx)
+	pv, err := r.data.DB.ProjectVersion.Query().Where(projectversion.HasProjectWith(project.ID(projectID)), projectversion.VersionEQ(version), projectversion.DeletedAtIsNil()).Only(ctx)
 	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
 	} else if pv == nil {
