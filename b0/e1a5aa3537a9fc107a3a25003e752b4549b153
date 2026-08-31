@@ -1,0 +1,19 @@
+devel/sandbox-kit/spec.yaml
+  s_4b10f54af90ab5::t_d2bd69f26ed5cd 371-373
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b0e1a5aa3537a9fc107a3a25003e752b4549b153",
+  "prompts": {},
+  "sessions": {
+    "s_4b10f54af90ab5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c38cbc47-25fd-4071-a3f4-ed5fbfc06ef2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Miguel Martinez <miguel@chainloop.dev>"
+    }
+  }
+}
