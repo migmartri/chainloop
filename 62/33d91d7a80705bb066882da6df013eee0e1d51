@@ -1,0 +1,35 @@
+.github/workflows/utils/bump-chart-and-dagger-version.sh
+  s_ffab93fdfb17b8::t_c269e14f8fb3ac 3,62-69
+  s_ffab93fdfb17b8::t_ec3460fa3bc4af 70
+devel/sandbox-kit/README.md
+  s_ffab93fdfb17b8::t_9d47c66b82316a 170,172-174
+  s_ffab93fdfb17b8::t_5ea91652103141 9,54,66,85,116,171
+  s_ffab93fdfb17b8::t_fe1086a65e2563 64,114
+devel/sandbox-kit/claude/spec.yaml
+  s_ffab93fdfb17b8::t_6a02825deb3665 1-400
+sbxenv.yaml
+  s_ffab93fdfb17b8::t_9acf16656434b0 55,57-66
+.github/workflows/package_sandbox_kit.yaml
+  s_ffab93fdfb17b8::t_0562ae9f2eb07f 1-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6233d91d7a80705bb066882da6df013eee0e1d51",
+  "prompts": {},
+  "humans": {
+    "h_cb14c7fdb7afb4": {
+      "author": "Miguel Martinez <miguel@chainloop.dev>"
+    }
+  },
+  "sessions": {
+    "s_ffab93fdfb17b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7da50f6b-428c-4749-82b5-562ae1ba890e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Miguel Martinez <miguel@chainloop.dev>"
+    }
+  }
+}
