@@ -1,0 +1,22 @@
+devel/sandbox-kit/claude/spec.yaml
+  s_ffab93fdfb17b8::t_ccd1349814d6ae 20-21,35-39,65-67
+  s_ffab93fdfb17b8::t_db180e155b4945 71,76,94-95,106-107,120-121,129-130
+  s_ffab93fdfb17b8::t_b2bb34ed847765 183,186-192,195-196,199-200
+  s_ffab93fdfb17b8::t_b0f3beabb34c7c 162-163,165-166,168-170,175-176,178-180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "37d616599f93c195770f0ff428cf71ab726f2e42",
+  "prompts": {},
+  "sessions": {
+    "s_ffab93fdfb17b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7da50f6b-428c-4749-82b5-562ae1ba890e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Miguel Martinez <miguel@chainloop.dev>"
+    }
+  }
+}
