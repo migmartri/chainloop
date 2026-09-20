@@ -1,0 +1,30 @@
+devel/sandbox-kit/claude/spec.yaml
+  s_ffab93fdfb17b8::t_3e257e2fea1cd0 38-40,44-50,52-63
+  s_ffab93fdfb17b8::t_ef87874f7f1dc3 1-2,4-19
+  s_ffab93fdfb17b8::t_a7d1df640bddef 20-28,69-70,83,106,109,120,178-182,304,333,341-342
+  s_ffab93fdfb17b8::t_861c5eff0311b7 3
+  s_ffab93fdfb17b8::t_331c94a35b0416 111-113,119,312,327-328
+  s_ffab93fdfb17b8::t_42192e02b809ea 183,185-191,193-194,196,198,200-203,205-210
+devel/sandbox-kit/README.md
+  s_ffab93fdfb17b8::t_ef87874f7f1dc3 10
+  s_ffab93fdfb17b8::t_740d6b163f96d7 36-44,86
+  s_ffab93fdfb17b8::t_861c5eff0311b7 9
+sbxenv.yaml
+  s_ffab93fdfb17b8::t_9f90476749be7f 76-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f33a2d3eb514205a8289a8f4a68acd05cb75c990",
+  "prompts": {},
+  "sessions": {
+    "s_ffab93fdfb17b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7da50f6b-428c-4749-82b5-562ae1ba890e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Miguel Martinez <miguel@chainloop.dev>"
+    }
+  }
+}
