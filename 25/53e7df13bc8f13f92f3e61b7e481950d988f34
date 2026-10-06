@@ -1,0 +1,25 @@
+.claude/skills/upgrading-golang/SKILL.md
+  s_d99d35866028aa::t_bc0760b9b5922c 82-89
+app/controlplane/api/controlplane/v1/signing.pb.go
+  s_d99d35866028aa::t_4c65eafd8ff0a5 130
+app/controlplane/api/workflowcontract/v1/crafting_schema.pb.go
+  s_d99d35866028aa::t_3eb049790d1959 850-854,1054-1056
+pkg/attestation/crafter/api/attestation/v1/crafting_state.pb.go
+  s_d99d35866028aa::t_af2be93b6b9c1b 2040,2105,2225
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2553e7df13bc8f13f92f3e61b7e481950d988f34",
+  "prompts": {},
+  "sessions": {
+    "s_d99d35866028aa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ae3fbe3d-4be5-4ff4-aa55-91a7526968ca",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Miguel Martinez <miguel@chainloop.dev>"
+    }
+  }
+}
