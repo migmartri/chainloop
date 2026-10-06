@@ -1,0 +1,36 @@
+.claude/skills/upgrading-golang/SKILL.md
+  s_d99d35866028aa::t_8f47b5bb6087c1 3,15,28-37,50-51,66-82,86,89,93,101,135,145,147,157
+app/controlplane/Dockerfile.goreleaser
+  s_d99d35866028aa::t_1830a24abf1b9a 1
+app/artifact-cas/Dockerfile.goreleaser
+  s_d99d35866028aa::t_6bd93658bcd8ee 1
+common.mk
+  s_d99d35866028aa::t_21050c5627151d 10-11
+app/cli/Dockerfile.goreleaser
+  s_d99d35866028aa::t_ffd3ce950fd2db 1
+.claude/skills/upgrading-golang/files-to-update.md
+  s_d99d35866028aa::t_1ac0c44faf3b00 25-35,60,65,67,70-72
+  s_d99d35866028aa::t_8a22b95a518eef 73
+go.mod
+  s_d99d35866028aa::t_22473fc88895ec 3
+CLAUDE.md
+  s_d99d35866028aa::t_9e8e800c70599a 142
+.github/workflows/lint.yml
+  s_d99d35866028aa::t_99fe0c82d78e3f 40,48,90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0db71375621dfc55bd4764b732092b74e033f16b",
+  "prompts": {},
+  "sessions": {
+    "s_d99d35866028aa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ae3fbe3d-4be5-4ff4-aa55-91a7526968ca",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": null
+    }
+  }
+}
